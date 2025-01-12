@@ -1,12 +1,12 @@
 import { Octokit } from "@octokit/core";
-import { Issue } from "../interfaces/Issue";
+import { IssueResponse } from "../interfaces/Issue";
 
 const token = import.meta.env.VITE_GITHUB_TOKEN;
 console.log('Token:', token);
-let issuesCache: { [key: string]: Issue[] } = {};
+let issuesCache: { [key: string]: IssueResponse[] } = {};
 
 // Pega todas as issues do repositório
-async function getAllIssues(gitRepo:string, gitOwner:string): Promise<Issue[]> {
+async function getAllIssues(gitRepo:string, gitOwner:string): Promise<IssueResponse[]> {
     const cacheKey = `${gitOwner}/${gitRepo}`;
 
     if (issuesCache[cacheKey]) {
@@ -30,9 +30,9 @@ async function getAllIssues(gitRepo:string, gitOwner:string): Promise<Issue[]> {
             }
         });
 
-        const issues = response.data as Issue[];
-        issuesCache[cacheKey] = issues;
-        return issues;
+        const result = response.data as IssueResponse[];
+        issuesCache[cacheKey] = result;
+        return result;
     } catch (error) {
         console.error('Error fetching repository issues:', error);
         return [];
