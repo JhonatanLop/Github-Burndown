@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import getAllIssues from './services/Issues';
-import { Issue } from './interfaces/Issue';
+import getAllMilestones from './services/Milestone';
+import { IssueResponse } from './interfaces/Issue';
+import { MilestoneResponse } from './interfaces/Milestone';
 
 function App() {
-  const [issues, setIssues] = useState<Issue[]>([]);
+  const [issues, setIssues] = useState<IssueResponse[]>([]);
+  const [milestones, setMilestones] = useState<MilestoneResponse[]>([]);
 
   useEffect(() => {
     async function fetchIssues() {
@@ -12,7 +15,13 @@ function App() {
       setIssues(issues);
     }
 
+    async function fetchMilestone() {
+      const milestones = await getAllMilestones('git-project-status', 'JhonatanLop');
+      console.log('Milestones:', milestones);
+      setMilestones(milestones);
+    }
     fetchIssues();
+    fetchMilestone();
   }, []);
 
   return (
@@ -23,6 +32,11 @@ function App() {
       <div>
         {issues.map(issue => (
           <div key={issue.id}>{issue.title}</div>
+        ))}
+      </div>
+      <div>
+        {milestones.map(milestone => (
+          <div key={milestone.number}>{milestone.title}</div>
         ))}
       </div>
     </>

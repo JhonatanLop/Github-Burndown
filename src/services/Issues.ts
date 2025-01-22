@@ -2,10 +2,9 @@ import { Octokit } from "@octokit/core";
 import { IssueResponse } from "../interfaces/Issue";
 
 const token = import.meta.env.VITE_GITHUB_TOKEN;
-console.log('Token:', token);
 let issuesCache: { [key: string]: IssueResponse[] } = {};
 
-// Pega todas as issues do repositório
+// Pega todas as issues/pull requests do repositório
 async function getAllIssues(gitRepo:string, gitOwner:string): Promise<IssueResponse[]> {
     const cacheKey = `${gitOwner}/${gitRepo}`;
 
@@ -30,6 +29,7 @@ async function getAllIssues(gitRepo:string, gitOwner:string): Promise<IssueRespo
             }
         });
 
+        // cacheia o resultado
         const result = response.data as IssueResponse[];
         issuesCache[cacheKey] = result;
         return result;
@@ -41,14 +41,3 @@ async function getAllIssues(gitRepo:string, gitOwner:string): Promise<IssueRespo
 
 export default getAllIssues;
 
-
-// meu plano original era fazer funções diferentes para minerar cada coisa da lista
-// mas para melhorar um pouco a performance, eu decidi fazer tudo em uma função só
-// isso é ruim pra manutenção, mas é bom para performance
-// vou precisar das seguintes informações para montar o dashboard:
-// - quantidade de issues abertas na sprint
-// - quantidade de issues fechadas na sprint
-// - quantidade de issues em progresso na sprint
-// - quantidade de issues com prioridade alta na sprint
-// - quantidade de issues com prioridade média na sprint
-// - quantidade de issues com prioridade baixa na sprint

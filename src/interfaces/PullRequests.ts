@@ -1,9 +1,6 @@
 export interface PullRequest {
     id: number;
     title: string;
+    body: string;
     state: string;
-    created_at: string;
-    closed_at: string;
-    html_url: string;
-    milestone: null;
 }
