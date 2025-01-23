@@ -9,20 +9,20 @@ function App() {
   const [milestones, setMilestones] = useState<MilestoneResponse[]>([]);
 
   useEffect(() => {
-    async function fetchIssues() {
-      const issues = await getAllIssues('git-project-status', 'JhonatanLop');
-      console.log('Issues:', issues);
-      setIssues(issues);
-    }
+      async function fetchIssues() {
+        const issues = await getAllIssues('git-project-status', 'JhonatanLop');
+        console.log('Issues:', issues);
+        setIssues(issues);
+      }
 
-    async function fetchMilestone() {
-      const milestones = await getAllMilestones('git-project-status', 'JhonatanLop');
-      console.log('Milestones:', milestones);
-      setMilestones(milestones);
-    }
-    fetchIssues();
-    fetchMilestone();
-  }, []);
+      async function fetchMilestone() {
+        const milestones = await getAllMilestones('git-project-status', 'JhonatanLop');
+        console.log('Milestones:', milestones);
+        setMilestones(milestones);
+      }
+      fetchIssues();
+      fetchMilestone();
+    }, []);
 
   return (
     <>
@@ -30,11 +30,14 @@ function App() {
         Iniciando projeto
       </div>
       <div>
+        <h2>Issues:</h2>
         {issues.map(issue => (
           <div key={issue.id}>{issue.title}</div>
         ))}
       </div>
+      <br></br>
       <div>
+        <h2>Milestones:</h2>
         {milestones.map(milestone => (
           <div key={milestone.number}>{milestone.title}</div>
         ))}

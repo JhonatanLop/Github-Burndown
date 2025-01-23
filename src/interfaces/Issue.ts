@@ -1,4 +1,4 @@
-import { LabelResponse } from "./Labels";
+import { Label } from "./Labels";
 import { MilestoneResponse } from "./Milestone";
 
 export interface Issue {
@@ -21,6 +21,6 @@ export interface IssueResponse {
     closed_at: string;
     html_url: string;
     milestone: MilestoneResponse;
-    labels: LabelResponse[];
+    labels: Label[];
     node_id: string;
 }
