@@ -1,5 +1,6 @@
 import { Octokit } from "@octokit/core";
-import { IssueResponse } from "../interfaces/Issue";
+import { IssueResponse, Issue } from "../interfaces/Issue";
+import { PullRequest } from "../interfaces/PullRequests";
 
 const token = import.meta.env.VITE_GITHUB_TOKEN;
 let issuesCache: { [key: string]: IssueResponse[] } = {};
@@ -37,6 +38,67 @@ async function getAllIssues(gitRepo:string, gitOwner:string): Promise<IssueRespo
         console.error('Error fetching repository issues:', error);
         return [];
     }
+};
+
+// Função responsável por dividir as Issues dos Pull Requests
+// Um dicionário de Issues e uma lista de Pull Requests
+function splitIssuesAndPullRequests(issues: IssueResponse[]) {
+    const result: { issues: { [key: string]: Issue }, pullRequests: PullRequest[] } = {
+        issues: {},
+        pullRequests: []
+    };
+
+    issues.forEach(issueResp => {
+        // se node_id começa com "I" é uma issue
+        if (issueResp.node_id.startsWith('I')) {
+            const issue: Issue = {
+                id: issueResp.id,
+                title: issueResp.title,
+                state: issueResp.state === 'open' ? 1 : issueResp.state === 'closed' ? 2 : 0,
+                created_at: issueResp.created_at,
+                closed_at: issueResp.closed_at,
+                html_url: issueResp.html_url,
+                sprint: issueResp.milestone?.title || ''
+            };
+            result.issues[issue.id] = issue;
+        }
+        // se não, é um pull request
+        else {
+            const pr: PullRequest = {
+                id: issueResp.id,
+                title: issueResp.title,
+                body: issueResp.body,
+                state: issueResp.state
+            }
+            result.pullRequests.push(pr);
+        }
+    }); 
+    return result 
+};
+
+// Função que passa por todos os pullrequests e corrige o estado da issue
+function fixIssueState(pullRequests: PullRequest[], issues: { [key: string]: Issue }) {
+    pullRequests.forEach(pr => {
+        // verifica as issues indexadas no body do pull request
+        const issueIds = pr.body.match(/#\d+/g);
+        if (!issueIds) {
+            return;
+        }
+        issueIds.forEach(issueId => {
+            const id = issueId.substring(1);
+            const issue = issues[id];
+            if (issue) {
+                // se o pull request está aberto, a issue está em revisão
+                if (pr.state === 'open') {
+                    issue.state = 3;
+                }
+                // se o pull request está fechado, a issue está feita
+                else {
+                    issue.state = 4;
+                }
+            }
+        });
+    });
 };
 
 export default getAllIssues;
