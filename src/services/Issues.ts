@@ -6,7 +6,7 @@ const token = import.meta.env.VITE_GITHUB_TOKEN;
 let issuesCache: { [key: string]: IssueResponse[] } = {};
 
 // Pega todas as issues/pull requests do repositório
-async function getAllIssues(gitRepo:string, gitOwner:string): Promise<IssueResponse[]> {
+async function fetchingAllIssues(gitRepo:string, gitOwner:string): Promise<IssueResponse[]> {
     const cacheKey = `${gitOwner}/${gitRepo}`;
 
     if (issuesCache[cacheKey]) {
@@ -40,9 +40,9 @@ async function getAllIssues(gitRepo:string, gitOwner:string): Promise<IssueRespo
     }
 };
 
-// Função responsável por dividir as Issues dos Pull Requests
-// Um dicionário de Issues e uma lista de Pull Requests
-function splitIssuesAndPullRequests(issues: IssueResponse[]) {
+// Função responsável por dividir as Issues e Pull Requests
+// Retorna um dicionário de Issues e um array de Pull Requests
+function splitIssuesAndPullRequests(issues: IssueResponse[]): { issues: { [key: string]: Issue }, pullRequests: PullRequest[] } {
     const result: { issues: { [key: string]: Issue }, pullRequests: PullRequest[] } = {
         issues: {},
         pullRequests: []
@@ -76,8 +76,9 @@ function splitIssuesAndPullRequests(issues: IssueResponse[]) {
     return result 
 };
 
-// Função que passa por todos os pullrequests e corrige o estado da issue
-function fixIssueState(pullRequests: PullRequest[], issues: { [key: string]: Issue }) {
+// Função que passa por todos os pull requests e corrige o estado da issue
+function fixIssueState(pullRequests: PullRequest[], issues: { [key: string]: Issue }): Issue[]{
+    const issuesArray: Issue[] = [];
     pullRequests.forEach(pr => {
         // verifica as issues indexadas no body do pull request
         const issueIds = pr.body.match(/#\d+/g);
@@ -97,9 +98,18 @@ function fixIssueState(pullRequests: PullRequest[], issues: { [key: string]: Iss
                     issue.state = 4;
                 }
             }
+            issuesArray.push(issue);
         });
     });
+    return issuesArray;
 };
 
-export default getAllIssues;
-
+function getIssues() {
+    let issuesFromGithub = fetchingAllIssues(import.meta.env.VITE_GIT_REPO as string, import.meta.env.VITE_GIT_OWNER as string);
+    return issuesFromGithub.then((issues) => {
+        const { issues: issuesDict, pullRequests } = splitIssuesAndPullRequests(issues);
+        fixIssueState(pullRequests, issuesDict);
+        return Object.values(issuesDict);
+    });
+}
+export default getIssues;

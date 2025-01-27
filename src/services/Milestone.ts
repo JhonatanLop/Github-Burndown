@@ -2,9 +2,9 @@ import { Octokit } from "@octokit/core";
 import { Milestone, MilestoneResponse } from "../interfaces/Milestone";
 
 const token = import.meta.env.VITE_GITHUB_TOKEN;
-let milestonesCache: { [key: string]: MilestoneResponse[] } = {};
+let milestonesCache: { [key: string]: Milestone[] } = {};
 
-async function getAllMilestones(gitRepo:string, gitOwner:string): Promise<MilestoneResponse[]> {
+async function fetchingAllMilestones(gitRepo:string, gitOwner:string): Promise<Milestone[]> {
     const cacheKey = `${gitOwner}/${gitRepo}`;
     
     if (milestonesCache[cacheKey]) {
@@ -49,4 +49,8 @@ async function getAllMilestones(gitRepo:string, gitOwner:string): Promise<Milest
     }
 };
 
-export default getAllMilestones;
+function getMilestones(): Promise<Milestone[]> {
+    return fetchingAllMilestones(import.meta.env.VITE_GIT_REPO as string, import.meta.env.VITE_GIT_OWNER as string);
+}
+
+export default getMilestones;

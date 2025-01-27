@@ -1,22 +1,22 @@
 import { useEffect, useState } from 'react';
 import getAllIssues from './services/Issues';
 import getAllMilestones from './services/Milestone';
-import { IssueResponse } from './interfaces/Issue';
-import { MilestoneResponse } from './interfaces/Milestone';
+import { Issue } from './interfaces/Issue';
+import { Milestone } from './interfaces/Milestone';
 
 function App() {
-  const [issues, setIssues] = useState<IssueResponse[]>([]);
-  const [milestones, setMilestones] = useState<MilestoneResponse[]>([]);
+  const [issues, setIssues] = useState<Issue[]>([]);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
 
   useEffect(() => {
       async function fetchIssues() {
-        const issues = await getAllIssues('git-project-status', 'JhonatanLop');
+        const issues = await getAllIssues();
         console.log('Issues:', issues);
         setIssues(issues);
       }
 
       async function fetchMilestone() {
-        const milestones = await getAllMilestones('git-project-status', 'JhonatanLop');
+        const milestones = await getAllMilestones();
         console.log('Milestones:', milestones);
         setMilestones(milestones);
       }
