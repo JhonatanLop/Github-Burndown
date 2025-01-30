@@ -4,11 +4,12 @@ import { MilestoneResponse } from "./Milestone";
 export interface Issue {
     id: number;
     title: string;
-    state: number; // 1=open; 2=closed; 3=review; 4=done
+    state: number; // 1=open; 3=review; 4=done
     created_at: string;
     closed_at: string;
     html_url: string;
     sprint: string; // sprint será o titulo do milestone
+    priority: number; // 1=low; 2=medium; 3=high
 }
 
 export interface IssueResponse {

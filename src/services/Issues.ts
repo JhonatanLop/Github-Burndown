@@ -51,14 +51,29 @@ function splitIssuesAndPullRequests(issues: IssueResponse[]): { issues: { [key: 
     issues.forEach(issueResp => {
         // se node_id começa com "I" é uma issue
         if (issueResp.node_id.startsWith('I')) {
+            // "https://github.com/JhonatanLop/git-project-status/issues/1"
+            // issue id é o ultimo número da url
+            const issueId : number = +(issueResp.html_url.split('/').pop());
             const issue: Issue = {
-                id: issueResp.id,
+                id: issueId,
                 title: issueResp.title,
                 state: issueResp.state === 'open' ? 1 : issueResp.state === 'closed' ? 2 : 0,
                 created_at: issueResp.created_at,
                 closed_at: issueResp.closed_at,
                 html_url: issueResp.html_url,
-                sprint: issueResp.milestone?.title || ''
+                sprint: issueResp.milestone?.title || '',
+                priority: 0
+            };
+            
+            // verifica as labels da issue para definir a prioridade
+            for (const label of issueResp.labels) {
+                if (label.name === 'Low') {
+                    issue.priority = 1;
+                } else if (label.name === 'medium') {
+                    issue.priority = 2;
+                } else if (label.name === 'high') {
+                    issue.priority = 3;
+                }
             };
             result.issues[issue.id] = issue;
         }
@@ -68,7 +83,7 @@ function splitIssuesAndPullRequests(issues: IssueResponse[]): { issues: { [key: 
                 id: issueResp.id,
                 title: issueResp.title,
                 body: issueResp.body,
-                state: issueResp.state
+                state: issueResp.state,
             }
             result.pullRequests.push(pr);
         }
@@ -78,23 +93,25 @@ function splitIssuesAndPullRequests(issues: IssueResponse[]): { issues: { [key: 
 
 // Função que passa por todos os pull requests e corrige o estado da issue
 function fixIssueState(pullRequests: PullRequest[], issues: { [key: string]: Issue }): Issue[]{
+    //ordernar os prs de data mais antiga para mais recente
+    // pullRequests.sort((a, b) => new Date(a.create_at).getTime() - new Date(b.create_at).getTime());
     const issuesArray: Issue[] = [];
     pullRequests.forEach(pr => {
         // verifica as issues indexadas no body do pull request
-        const issueIds = pr.body.match(/#\d+/g);
+        const issueIds = pr.body.match(/- resolve #\d+/g)?.map(match => match.match(/\d+/)[0]);
         if (!issueIds) {
             return;
         }
         issueIds.forEach(issueId => {
-            const id = issueId.substring(1);
+            const id : number = +issueId;
             const issue = issues[id];
             if (issue) {
                 // se o pull request está aberto, a issue está em revisão
-                if (pr.state === 'open') {
+                if (pr.state && issue.state === 1 || issue.state === 3) {
                     issue.state = 3;
                 }
                 // se o pull request está fechado, a issue está feita
-                else {
+                else  {
                     issue.state = 4;
                 }
             }
@@ -111,5 +128,6 @@ function getIssues() {
         fixIssueState(pullRequests, issuesDict);
         return Object.values(issuesDict);
     });
+    // return issuesFromGithub;
 }
 export default getIssues;
