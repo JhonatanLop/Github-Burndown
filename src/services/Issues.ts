@@ -53,7 +53,7 @@ function splitIssuesAndPullRequests(issues: IssueResponse[]): { issues: { [key: 
         if (issueResp.node_id.startsWith('I')) {
             // "https://github.com/JhonatanLop/git-project-status/issues/1"
             // issue id é o ultimo número da url
-            const issueId : number = +(issueResp.html_url.split('/').pop());
+            const issueId : number = +(issueResp.html_url.split('/').pop() || 0);
             const issue: Issue = {
                 id: issueId,
                 title: issueResp.title,
@@ -94,7 +94,6 @@ function splitIssuesAndPullRequests(issues: IssueResponse[]): { issues: { [key: 
 // Função que passa por todos os pull requests e corrige o estado da issue
 function fixIssueState(pullRequests: PullRequest[], issues: { [key: string]: Issue }): Issue[]{
     //ordernar os prs de data mais antiga para mais recente
-    // pullRequests.sort((a, b) => new Date(a.create_at).getTime() - new Date(b.create_at).getTime());
     const issuesArray: Issue[] = [];
     pullRequests.forEach(pr => {
         // verifica as issues indexadas no body do pull request
