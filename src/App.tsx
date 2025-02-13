@@ -3,6 +3,7 @@ import getAllIssues from './services/Issues';
 import getAllMilestones from './services/Milestone';
 import { Issue } from './interfaces/Issue';
 import { Milestone } from './interfaces/Milestone';
+import './App.css';
 
 function App() {
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -26,7 +27,7 @@ function App() {
 
   return (
     <>
-      <div>
+      {/* <div>
         Iniciando projeto
       </div>
       <div>
@@ -41,7 +42,14 @@ function App() {
         {milestones.map(milestone => (
           <div key={milestone.number}>{milestone.title}</div>
         ))}
-      </div>
+      </div> */}
+      <header>
+        <h1 className='title'>
+          Dashboard Khali
+        </h1>
+      </header>
+      <main>
+      </main>
     </>
   );
 }
