@@ -9,6 +9,8 @@
 
 body{
   margin: 0;
+  max-width: 100vw;
+  max-height: 100vh;
 }
 
 /* classes do header */
@@ -37,6 +39,18 @@ header{
 /* classes do main */
 main{
   height: 95vh;
-  width: 100vw;
+  width: 98vw;
+  padding-top: 2vh;
+  padding-bottom: 3vh;
+  padding-left: 1vw;
+  padding-right: 1vw;
   background-color: #0D1117;
+}
+
+.conteiner{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #818B98;
+  border-radius: 8px;
 }

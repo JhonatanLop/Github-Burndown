@@ -3,6 +3,7 @@ import getAllIssues from './services/Issues';
 import getAllMilestones from './services/Milestone';
 import { Issue } from './interfaces/Issue';
 import { Milestone } from './interfaces/Milestone';
+import Burndown from './components/Burndown';
 import './App.css';
 
 function App() {
@@ -10,20 +11,20 @@ function App() {
   const [milestones, setMilestones] = useState<Milestone[]>([]);
 
   useEffect(() => {
-      async function fetchIssues() {
-        const issues = await getAllIssues();
-        console.log('Issues:', issues);
-        setIssues(issues);
-      }
+    async function fetchIssues() {
+      const issues = await getAllIssues();
+      console.log('Issues:', issues);
+      setIssues(issues);
+    }
 
-      async function fetchMilestone() {
-        const milestones = await getAllMilestones();
-        console.log('Milestones:', milestones);
-        setMilestones(milestones);
-      }
-      fetchIssues();
-      fetchMilestone();
-    }, []);
+    async function fetchMilestone() {
+      const milestones = await getAllMilestones();
+      console.log('Milestones:', milestones);
+      setMilestones(milestones);
+    }
+    fetchIssues();
+    fetchMilestone();
+  }, []);
 
   return (
     <>
@@ -49,6 +50,11 @@ function App() {
         </h1>
       </header>
       <main>
+        <div className='conteiner'>
+          <div className='burndown'>
+            <Burndown labels={["01","02","03","04","05"]} distribution={[12,6,3,1,0]} points={[12,10,8,6,3]} />
+          </div>
+        </div>
       </main>
     </>
   );
