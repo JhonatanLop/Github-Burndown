@@ -48,6 +48,9 @@ function App() {
         <h1 className='title'>
           Dashboard Khali
         </h1>
+        <button type="button" id='config' className='config'>
+          <img src="https://cdn-icons-png.flaticon.com/512/59/59108.png" alt="Configurações" width={30} height={30}/>
+        </button>
       </header>
       <main>
         <div className='conteiner'>
