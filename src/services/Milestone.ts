@@ -49,6 +49,16 @@ async function fetchingAllMilestones(gitRepo:string, gitOwner:string): Promise<M
     }
 };
 
+function getSprintDays(sprint:Milestone): string[] {
+    const start = new Date(sprint.start_on);
+    const end = new Date(sprint.due_on);
+    const days = [];
+    for (let i = start; i <= end; i.setDate(i.getDate() + 1)) {
+        days.push(i.toDateString());
+    }
+    return days;
+}
+
 function getMilestones(): Promise<Milestone[]> {
     return fetchingAllMilestones(import.meta.env.VITE_GIT_REPO as string, import.meta.env.VITE_GIT_OWNER as string);
 }
