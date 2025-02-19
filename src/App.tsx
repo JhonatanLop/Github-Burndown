@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import getAllIssues from './services/Issues';
+import getIssues from './services/Issues';
 import getAllMilestones from './services/Milestone';
 import { Issue } from './interfaces/Issue';
 import { Milestone } from './interfaces/Milestone';
@@ -7,34 +7,35 @@ import Burndown from './components/Burndown';
 import './App.css';
 
 function App() {
-  const [issues, setIssues] = useState<Issue[]>([]);
   const [milestones, setMilestones] = useState<Milestone[]>([]);
-  const [sprint, setSprint] = useState<string>();
-  const [selectedSprint, setSelectedSprint] = useState<string | undefined>(undefined);
+  const [selectedSprint, setSelectedSprint] = useState<string>('');
+  const [issues, setIssues] = useState<Issue[]>([]);
 
   useEffect(() => {
-    async function fetchIssues() {
-      const issues = await getAllIssues();
-      console.log('Issues:', issues);
-      setIssues(issues);
-    }
-
     async function fetchMilestone() {
       const milestones = await getAllMilestones();
-      console.log('Milestones:', milestones);
       setMilestones(milestones);
-      setSprint(milestones[0].title);
+      setSelectedSprint(milestones[milestones.length-1].title);
     }
-    fetchIssues();
+    
     fetchMilestone();
   }, []);
+
+  useEffect(() => {
+    if (selectedSprint) {
+      async function fetchIssues() {
+        setIssues(await getIssues(selectedSprint));
+      }
+
+      fetchIssues();
+    }
+  }, [selectedSprint]);
 
   const handleSprintChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const sprint = event.target.value;
     setSelectedSprint(sprint);
-    setSprint(sprint);
-    // Carregar dados adicionais, se necessário
   };
+
   return (
     <>
       <header>
