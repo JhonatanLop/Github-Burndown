@@ -2,7 +2,6 @@ import { Octokit } from "@octokit/core";
 import { IssueResponse, Issue } from "../interfaces/Issue";
 import { PullRequest } from "../interfaces/PullRequests";
 
-const token = import.meta.env.VITE_GITHUB_TOKEN;
 let issuesCache: { [key: string]: IssueResponse[] } = {};
 
 // Pega todas as issues/pull requests do repositório
@@ -13,13 +12,13 @@ async function fetchingAllIssues(gitRepo:string, gitOwner:string): Promise<Issue
         return issuesCache[cacheKey];
     }
 
-    if (!token) {
-        console.error('GITHUB_TOKEN is not set');
+    if (!import.meta.env.VITE_GITHUB_TOKEN) {
+        console.error('Authentication token not found');
         return [];
     }
 
     try {
-        const octokit = new Octokit({ auth: token });
+        const octokit = new Octokit({ auth: import.meta.env.VITE_GITHUB_TOKEN });
         const response = await octokit.request('GET /repos/{owner}/{repo}/issues', {
             owner: gitOwner,
             repo: gitRepo,
