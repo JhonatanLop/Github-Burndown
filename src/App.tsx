@@ -15,9 +15,9 @@ function App() {
     async function fetchMilestone() {
       const milestones = await getAllMilestones();
       setMilestones(milestones);
-      setSelectedSprint(milestones[milestones.length-1].title);
+      setSelectedSprint(milestones[milestones.length - 1].title);
     }
-    
+
     fetchMilestone();
   }, []);
 
@@ -59,22 +59,6 @@ function App() {
           </div>
         </div>
       </main>
-      {/* <div>
-        Iniciando projeto
-      </div>
-      <div>
-        <h2>Issues:</h2>
-        {issues.map(issue => (
-          <div key={issue.id}>{issue.title}</div>
-        ))}
-      </div>
-      <br></br>
-      <div>
-        <h2>Milestones:</h2>
-        {milestones.map(milestone => (
-          <div key={milestone.number}>{milestone.title}</div>
-        ))}
-      </div> */}
     </>
   );
 }

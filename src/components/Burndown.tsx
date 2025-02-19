@@ -53,8 +53,7 @@ const ChartComponent: React.FC<ChartComponentProps> = ({labels, distribution, po
 
     return () => chartInstance.destroy();
   }, [labels, distribution, points]);
-
-  return <canvas ref={chartRef} width={1600} height={700}/>;
+  return <canvas ref={chartRef} width={1776} height={777}/>;
 };
 
 export default ChartComponent;
