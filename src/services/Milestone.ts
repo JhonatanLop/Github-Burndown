@@ -54,7 +54,7 @@ function getSprintDays(sprint:Milestone): string[] {
     const end = new Date(sprint.due_on);
     const days = [];
     for (let i = start; i <= end; i.setDate(i.getDate() + 1)) {
-        days.push(i.toDateString());
+        days.push(new Date(i).toISOString().split('T')[0]);
     }
     return days;
 }
@@ -63,4 +63,5 @@ function getMilestones(): Promise<Milestone[]> {
     return fetchingAllMilestones(import.meta.env.VITE_GIT_REPO as string, import.meta.env.VITE_GIT_OWNER as string);
 }
 
-export default getMilestones;
+// export default getMilestones;
+export { getMilestones, getSprintDays };

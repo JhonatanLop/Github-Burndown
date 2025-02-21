@@ -57,8 +57,8 @@ function splitIssuesAndPullRequests(issues: IssueResponse[]): { issues: { [key: 
                 id: issueId,
                 title: issueResp.title,
                 state: issueResp.state === 'open' ? 1 : issueResp.state === 'closed' ? 2 : 0,
-                created_at: issueResp.created_at,
-                closed_at: issueResp.closed_at,
+                created_at: new Date(issueResp.created_at).toISOString().split('T')[0],
+                closed_at: issueResp.closed_at ? new Date(issueResp.closed_at).toISOString().split('T')[0]: '',
                 html_url: issueResp.html_url,
                 sprint: issueResp.milestone?.title || '',
                 priority: 0
@@ -66,7 +66,7 @@ function splitIssuesAndPullRequests(issues: IssueResponse[]): { issues: { [key: 
 
             // verifica as labels da issue para definir a prioridade
             for (const label of issueResp.labels) {
-                if (label.name === 'Low') {
+                if (label.name === 'low') {
                     issue.priority = 1;
                 } else if (label.name === 'medium') {
                     issue.priority = 2;
@@ -121,7 +121,7 @@ function fixIssueState(pullRequests: PullRequest[], issues: { [key: string]: Iss
 
 function getIssues(sprint: string): Promise<Issue[]> {
     let issuesFromGithub = fetchingAllIssues(import.meta.env.VITE_GIT_REPO as string, import.meta.env.VITE_GIT_OWNER as string);
-    
+
     // Filtra as issues do sprint selecionado
     issuesFromGithub = issuesFromGithub.then((issues) => {
         return issues.filter(issue => issue.milestone?.title == sprint);
