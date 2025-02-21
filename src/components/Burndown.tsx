@@ -2,12 +2,12 @@ import React, { useEffect, useRef } from 'react';
 import { Chart, ChartData, ChartOptions } from 'chart.js/auto';
 
 interface ChartComponentProps {
-  labels: string[];
-  distribution: number[];
-  points: number[];
+  days: string[];
+  predicted: number[];
+  done: number[];
 }
 
-const ChartComponent: React.FC<ChartComponentProps> = ({labels, distribution, points}) => {
+const ChartComponent: React.FC<ChartComponentProps> = ({days, predicted, done}) => {
   const chartRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -17,18 +17,18 @@ const ChartComponent: React.FC<ChartComponentProps> = ({labels, distribution, po
     if (!ctx) return;
 
     const chartData: ChartData = {
-      labels,
+      labels: days,
       datasets: [
         {
-          label: 'Distribution',
-          data: distribution,
+          label: 'Predicted',
+          data: predicted,
           backgroundColor: ['#1E2632'],
           borderColor: ['#1F6FEB'],
           borderWidth: 1,
         },
         {
-          label: 'Points Remaining',
-          data: points,
+          label: 'Actually done',
+          data: done,
           backgroundColor: ['#2C2734'],
           borderColor: ['#AB7DF8'],
           borderWidth: 1,
@@ -52,7 +52,7 @@ const ChartComponent: React.FC<ChartComponentProps> = ({labels, distribution, po
     });
 
     return () => chartInstance.destroy();
-  }, [labels, distribution, points]);
+  }, [days, predicted, done]);
   return <canvas ref={chartRef} width={1776} height={777}/>;
 };
 
