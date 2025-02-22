@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import getIssues from './services/Issues';
 import { getMilestones, getSprintDays } from './services/Milestone';
-import { Issue } from './interfaces/Issue';
 import { Milestone } from './interfaces/Milestone';
 import Burndown from './components/Burndown';
 import './App.css';
@@ -9,27 +8,21 @@ import './App.css';
 function App() {
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [selectedSprint, setSelectedSprint] = useState<Milestone>();
-  const [issues, setIssues] = useState<Issue[]>([]);
-  const [days, setDays] = useState<string[]>();
 
   useEffect(() => {
     async function fetchData() {
       const milestones = await getMilestones();
       setMilestones(milestones);
 
-      const selected = milestones[milestones.length - 1];
-      setSelectedSprint(selected);
-
-      const days = getSprintDays(selected);
-      setDays(days);
-
-      const myIssues = await getIssues(selected.title);
-      setIssues(myIssues);
+      const sprint = milestones[milestones.length - 1];
+      sprint.days = getSprintDays(sprint);
+      sprint.issues = await getIssues(sprint.title);
+      setSelectedSprint(sprint);
 
       // console.log('Milestones:', milestones);
-      // console.log('Selected Sprint:', selected);
-      // console.log('Days:', days);
-      // console.log('Issues:', myIssues);
+      // console.log('Selected Sprint:', sprint);
+      // console.log('Days:', sprint.days);
+      // console.log('Issues:', sprint.issues);
     }
 
     fetchData();
@@ -39,13 +32,14 @@ function App() {
     const sprintTitle = event.target.value;
     const sprint = milestones.find(milestone => milestone.title === sprintTitle);
     if (sprint) {
+      sprint.days = getSprintDays(sprint);
+      
+      sprint.issues = await getIssues(sprint.title);
+      
       setSelectedSprint(sprint);
-
-      const days = getSprintDays(sprint);
-      setDays(days);
-
-      const myIssues = await getIssues(sprint.title);
-      setIssues(myIssues);
+      // console.log('Selected Sprint:', sprint);
+      // console.log('Days:', sprint.days);
+      // console.log('Issues:', sprint.issues);
     }
   };
 
