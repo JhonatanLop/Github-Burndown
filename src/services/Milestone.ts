@@ -1,7 +1,6 @@
 import { Octokit } from "@octokit/core";
 import { Milestone, MilestoneResponse } from "../interfaces/Milestone";
 
-const token = import.meta.env.VITE_GITHUB_TOKEN;
 let milestonesCache: { [key: string]: Milestone[] } = {};
 
 async function fetchingAllMilestones(gitRepo:string, gitOwner:string): Promise<Milestone[]> {
@@ -13,7 +12,7 @@ async function fetchingAllMilestones(gitRepo:string, gitOwner:string): Promise<M
 
     try {
         // Pega todas as milestones do repositório
-        const octokit = new Octokit({ auth: token });
+        const octokit = new Octokit({ auth: import.meta.env.VITE_GITHUB_TOKEN });
         const response = await octokit.request('GET /repos/{owner}/{repo}/milestones', {
             owner: gitOwner,
             repo: gitRepo,
