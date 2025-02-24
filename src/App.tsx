@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import getIssues from './services/Issues';
+import { getIssues, getPrediction, getDone} from './services/Issues';
 import { getMilestones, getSprintDays } from './services/Milestone';
 import { Milestone } from './interfaces/Milestone';
 import Burndown from './components/Burndown';
@@ -15,9 +15,7 @@ function App() {
       setMilestones(milestones);
 
       const sprint = milestones[milestones.length - 1];
-      sprint.days = getSprintDays(sprint);
-      sprint.issues = await getIssues(sprint.title);
-      setSelectedSprint(sprint);
+      await updateSprint(sprint);
 
       // console.log('Milestones:', milestones);
       // console.log('Selected Sprint:', sprint);
@@ -32,17 +30,20 @@ function App() {
     const sprintTitle = event.target.value;
     const sprint = milestones.find(milestone => milestone.title === sprintTitle);
     if (sprint) {
-      sprint.days = getSprintDays(sprint);
-      
-      sprint.issues = await getIssues(sprint.title);
-      
-      setSelectedSprint(sprint);
+      await updateSprint(sprint);
       // console.log('Selected Sprint:', sprint);
       // console.log('Days:', sprint.days);
       // console.log('Issues:', sprint.issues);
     }
   };
 
+  async function updateSprint(sprint: Milestone) {
+    sprint.days = getSprintDays(sprint);
+    sprint.issues = await getIssues(sprint.title);
+    sprint.predicted = getPrediction(sprint.issues, sprint.days.length);
+    sprint.done = getDone(sprint.issues, sprint.days);
+    setSelectedSprint(sprint);
+  }
   return (
     <>
       <header>
@@ -62,7 +63,7 @@ function App() {
       <main>
         <div className='conteiner'>
           <div className='burndown'>
-            <Burndown days={["01", "02", "03", "04", "05"]} predicted={[12, 6, 3, 1, 0]} done={[12, 10, 8, 6]} />
+            <Burndown days={selectedSprint ? selectedSprint.days : ['']} predicted={[12, 6, 3, 1, 0]} done={[12, 10, 8, 6]} />
           </div>
         </div>
       </main>
