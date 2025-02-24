@@ -58,7 +58,7 @@ function splitIssuesAndPullRequests(issues: IssueResponse[]): { issues: { [key: 
                 title: issueResp.title,
                 state: issueResp.state === 'open' ? 1 : issueResp.state === 'closed' ? 2 : 0,
                 created_at: new Date(issueResp.created_at).toISOString().split('T')[0],
-                closed_at: issueResp.closed_at ? new Date(issueResp.closed_at).toISOString().split('T')[0]: '',
+                closed_at: issueResp.closed_at ? new Date(issueResp.closed_at).toISOString().split('T')[0] : '',
                 html_url: issueResp.html_url,
                 sprint: issueResp.milestone?.title || '',
                 priority: 0
@@ -133,4 +133,55 @@ function getIssues(sprint: string): Promise<Issue[]> {
         return Object.values(issuesDict);
     });
 }
-export default getIssues;
+
+function getPrediction(issues: Issue[], days: number): number[] {
+    const totalPriority = issues.reduce((acc, issue) => acc + issue.priority, 0);
+    const prediction = [];
+    const distribution = Math.ceil(totalPriority / days);
+    for (let i = days; i > 0; i--) {
+        prediction.push(distribution * i);
+    }
+    return prediction;
+}
+
+function getDone(issues: Issue[], days: string[]): number[] {
+    const done: number[] = [];
+    
+    issues.sort((a, b) => {
+        if (a.closed_at < b.closed_at) {
+            return -1;
+        }
+        if (a.closed_at > b.closed_at) {
+            return 1;
+        }
+        return 0;
+    });
+
+    days.sort((a, b) => {
+        if (a < b) {
+            return -1;
+        }
+        if (a > b) {
+            return 1;
+        }
+        return 0;
+    });
+    let allPoints = issues.reduce((acc, issue) => acc + issue.priority, 0);
+
+    for (let i = 0; i < days.length; i++) {
+        const day = days[i];
+        let pointsBurned = 0;
+
+        issues.forEach(issue => {
+            if (issue.closed_at === day && issue.state === 4) {
+                pointsBurned += issue.priority;
+            }
+        });
+        
+        allPoints -= pointsBurned
+        done[i] = allPoints;
+    }
+    return done;
+}
+
+export { getIssues, getPrediction, getDone };
