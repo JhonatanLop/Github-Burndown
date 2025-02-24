@@ -147,40 +147,31 @@ function getPrediction(issues: Issue[], days: number): number[] {
 function getDone(issues: Issue[], days: string[]): number[] {
     const done: number[] = [];
     
-    issues.sort((a, b) => {
-        if (a.closed_at < b.closed_at) {
-            return -1;
-        }
-        if (a.closed_at > b.closed_at) {
-            return 1;
-        }
-        return 0;
-    });
+    // ordenação dos arrays
+    issues.sort((a, b) => a.closed_at.localeCompare(b.closed_at));
+    // days.sort((a, b) => a.localeCompare(b));
 
-    days.sort((a, b) => {
-        if (a < b) {
-            return -1;
-        }
-        if (a > b) {
-            return 1;
-        }
-        return 0;
-    });
+    // pontos totais
     let allPoints = issues.reduce((acc, issue) => acc + issue.priority, 0);
 
-    for (let i = 0; i < days.length; i++) {
-        const day = days[i];
-        let pointsBurned = 0;
+    // mapeamento dos pontos queimados por dia
+    const pointsBurnedPerDay = new Map<string, number>();
+    issues.forEach(issue => {
+        if (issue.state === 4) {
+            pointsBurnedPerDay.set(issue.closed_at, (pointsBurnedPerDay.get(issue.closed_at) || 0) + issue.priority);
+        }
+    });
 
-        issues.forEach(issue => {
-            if (issue.closed_at === day && issue.state === 4) {
-                pointsBurned += issue.priority;
-            }
-        });
-        
-        allPoints -= pointsBurned
+    // Calcula os pontos restantes para cada dia
+    days.forEach((day, i) => {
+        if (new Date(day) > new Date()) {
+            return;
+        }
+        const pointsBurned = pointsBurnedPerDay.get(day) || 0;
+        allPoints -= pointsBurned;
         done[i] = allPoints;
-    }
+    });
+
     return done;
 }
 
