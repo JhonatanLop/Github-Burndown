@@ -4,7 +4,7 @@ import { MilestoneResponse } from "./Milestone";
 export interface Issue {
     id: number;
     title: string;
-    state: number; // 1=open; 3=review; 4=done
+    state: number; // 1=open; 2=closed; 3=review; 4=done
     created_at: string;
     closed_at: string;
     html_url: string;

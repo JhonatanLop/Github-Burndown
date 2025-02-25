@@ -6,6 +6,7 @@ let issuesCache: { [key: string]: IssueResponse[] } = {};
 
 // Pega todas as issues/pull requests do repositório
 async function fetchingAllIssues(gitRepo: string, gitOwner: string): Promise<IssueResponse[]> {
+    const gitRepos = gitRepo.split(',');
     const cacheKey = `${gitOwner}/${gitRepo}`;
 
     if (issuesCache[cacheKey]) {
@@ -13,31 +14,34 @@ async function fetchingAllIssues(gitRepo: string, gitOwner: string): Promise<Iss
     }
 
     if (!import.meta.env.VITE_GITHUB_TOKEN) {
-        console.error('Authentication token not found');
+        console.error('Authentication failed. Please provide a valid GitHub token.');
         return [];
     }
 
     try {
         const octokit = new Octokit({ auth: import.meta.env.VITE_GITHUB_TOKEN });
-        const response = await octokit.request('GET /repos/{owner}/{repo}/issues', {
-            owner: gitOwner,
-            repo: gitRepo,
-            state: 'all',
-            per_page: 100,
-            headers: {
-                'X-GitHub-Api-Version': '2022-11-28'
-            }
+        const promises = gitRepos.map(async repo => {
+            const response = await octokit.request('GET /repos/{owner}/{repo}/issues', {
+                owner: gitOwner,
+                repo: repo,
+                state: 'all',
+                per_page: 100,
+                headers: {
+                    'X-GitHub-Api-Version': '2022-11-28'
+                }
+            });
+            return response.data as IssueResponse[];
         });
 
-        // cacheia o resultado
-        const result = response.data as IssueResponse[];
-        issuesCache[cacheKey] = result;
-        return result;
+        const results = await Promise.all(promises);
+        const flattenedResults = results.flat();
+        issuesCache[cacheKey] = flattenedResults;
+        return flattenedResults;
     } catch (error) {
         console.error('Error fetching repository issues:', error);
         return [];
     }
-};
+}
 
 // Função responsável por dividir as Issues e Pull Requests
 // Retorna um dicionário de Issues e um array de Pull Requests
@@ -137,16 +141,16 @@ function getIssues(sprint: string): Promise<Issue[]> {
 function getPrediction(issues: Issue[], days: number): number[] {
     const totalPriority = issues.reduce((acc, issue) => acc + issue.priority, 0);
     const prediction = [];
-    const distribution = Math.ceil(totalPriority / days);
-    for (let i = days; i > 0; i--) {
-        prediction.push(distribution * i);
+    const distribution = (totalPriority / days);
+    for (let i = 0; i < days; i++) {
+        prediction.push(totalPriority - (distribution * i));
     }
     return prediction;
 }
 
 function getDone(issues: Issue[], days: string[]): number[] {
     const done: number[] = [];
-    
+
     // ordenação dos arrays
     issues.sort((a, b) => a.closed_at.localeCompare(b.closed_at));
     // days.sort((a, b) => a.localeCompare(b));
@@ -158,7 +162,7 @@ function getDone(issues: Issue[], days: string[]): number[] {
     const pointsBurnedPerDay = new Map<string, number>();
     issues.forEach(issue => {
         if (issue.state === 4) {
-            pointsBurnedPerDay.set(issue.closed_at, (pointsBurnedPerDay.get(issue.closed_at) || 0) + issue.priority);
+            pointsBurnedPerDay.set(issue.closed_at, (pointsBurnedPerDay.get(issue.closed_at) || 0) + 1);
         }
     });
 
@@ -171,7 +175,6 @@ function getDone(issues: Issue[], days: string[]): number[] {
         allPoints -= pointsBurned;
         done[i] = allPoints;
     });
-
     return done;
 }
 
