@@ -4,6 +4,9 @@ import { Milestone, MilestoneResponse } from "../interfaces/Milestone";
 let milestonesCache: { [key: string]: Milestone[] } = {};
 
 async function fetchingAllMilestones(gitRepo:string, gitOwner:string): Promise<Milestone[]> {
+    console.log(gitRepo);
+    
+    const gitRepos = gitRepo.split(',');
     const cacheKey = `${gitOwner}/${gitRepo}`;
     
     if (milestonesCache[cacheKey]) {
@@ -15,7 +18,7 @@ async function fetchingAllMilestones(gitRepo:string, gitOwner:string): Promise<M
         const octokit = new Octokit({ auth: import.meta.env.VITE_GITHUB_TOKEN });
         const response = await octokit.request('GET /repos/{owner}/{repo}/milestones', {
             owner: gitOwner,
-            repo: gitRepo,
+            repo: gitRepos[0],
             per_page: 100,
             state: 'all',
             headers: {
