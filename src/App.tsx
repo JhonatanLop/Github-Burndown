@@ -63,7 +63,7 @@ function App() {
       <main>
         <div className='conteiner'>
           <div className='burndown'>
-            <Burndown days={selectedSprint ? selectedSprint.days : ['']} predicted={[12, 6, 3, 1, 0]} done={[12, 10, 8, 6]} />
+            <Burndown days={selectedSprint ? selectedSprint.days : ['']} predicted={selectedSprint ? selectedSprint.predicted : []} done={selectedSprint ? selectedSprint.done : []} />
           </div>
         </div>
       </main>
