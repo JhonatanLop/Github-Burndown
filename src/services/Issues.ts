@@ -162,7 +162,7 @@ function getDone(issues: Issue[], days: string[]): number[] {
     const pointsBurnedPerDay = new Map<string, number>();
     issues.forEach(issue => {
         if (issue.state === 4) {
-            pointsBurnedPerDay.set(issue.closed_at, (pointsBurnedPerDay.get(issue.closed_at) || 0) + 1);
+            pointsBurnedPerDay.set(issue.closed_at, (pointsBurnedPerDay.get(issue.closed_at) || 0) + issue.priority);
         }
     });
 
