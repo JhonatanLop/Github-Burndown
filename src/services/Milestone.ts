@@ -4,8 +4,6 @@ import { Milestone, MilestoneResponse } from "../interfaces/Milestone";
 let milestonesCache: { [key: string]: Milestone[] } = {};
 
 async function fetchingAllMilestones(gitRepo:string, gitOwner:string): Promise<Milestone[]> {
-    console.log(gitRepo);
-    
     const gitRepos = gitRepo.split(',');
     const cacheKey = `${gitOwner}/${gitRepo}`;
     
@@ -32,7 +30,7 @@ async function fetchingAllMilestones(gitRepo:string, gitOwner:string): Promise<M
         // O tipo Milestone tem a data de início 3 semanas antes da data de entrega
         const milestones = result.map((milestone) => {
             const start_on = new Date(milestone.due_on);
-            start_on.setDate(start_on.getDate() - 21);
+            start_on.setDate(start_on.getDate() - parseInt(import.meta.env.VITE_SPRINT_DURATION, 10));
 
             return {
                 title: milestone.title,

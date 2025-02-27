@@ -70,12 +70,19 @@ function splitIssuesAndPullRequests(issues: IssueResponse[]): { issues: { [key: 
 
             // verifica as labels da issue para definir a prioridade
             for (const label of issueResp.labels) {
-                if (label.name === 'low') {
-                    issue.priority = 1;
-                } else if (label.name === 'medium') {
-                    issue.priority = 2;
-                } else if (label.name === 'high') {
-                    issue.priority = 3;
+                switch (label.name) {
+                    case "low":
+                        issue.priority = 1;
+                        break;
+                    case "medium":
+                        issue.priority = 2;
+                        break;
+                    case "high":
+                        issue.priority = 3;
+                        break;
+                    default:
+                        issue.priority = 1;
+                        break;
                 }
             };
             result.issues[issue.id] = issue;
@@ -100,7 +107,7 @@ function fixIssueState(pullRequests: PullRequest[], issues: { [key: string]: Iss
     const issuesArray: Issue[] = [];
     pullRequests.forEach(pr => {
         // verifica as issues indexadas no body do pull request
-        const issueIds = pr.body.match(/- resolve #\d+/g)?.map(match => match.match(/\d+/)[0]);
+        const issueIds = pr.body.match(/- resolve #\d+/g)?.map(match => match.match(/\d+/)![0]);
         if (!issueIds) {
             return;
         }
