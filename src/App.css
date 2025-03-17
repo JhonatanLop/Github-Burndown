@@ -88,4 +88,6 @@ main {
   align-items: center;
   border: 2px solid #818B98;
   border-radius: 8px;
+  width: 97vw;
+  height: 87vh;
 }

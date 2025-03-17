@@ -8,6 +8,24 @@ import './App.css';
 function App() {
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [selectedSprint, setSelectedSprint] = useState<Milestone>();
+  const [dimensions, setDimensions] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+  useEffect(() => {
+    function updateDimensions() {
+      const width = window.innerWidth * 0.93;
+      const height = window.innerHeight * 0.88;
+      console.log(window.innerWidth,window.innerHeight);
+      console.log(width,height);
+      setDimensions({ width, height });
+    }
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+
+    return () => {
+      window.removeEventListener('resize', updateDimensions);
+    };
+  }, []);
 
   useEffect(() => {
     async function fetchData() {
@@ -16,11 +34,6 @@ function App() {
 
       const sprint = milestones[milestones.length - 1];
       await updateSprint(sprint);
-
-      // console.log('Milestones:', milestones);
-      // console.log('Selected Sprint:', sprint);
-      // console.log('Days:', sprint.days);
-      // console.log('Issues:', sprint.issues);
     }
 
     fetchData();
@@ -31,9 +44,6 @@ function App() {
     const sprint = milestones.find(milestone => milestone.title === sprintTitle);
     if (sprint) {
       await updateSprint(sprint);
-      // console.log('Selected Sprint:', sprint);
-      // console.log('Days:', sprint.days);
-      // console.log('Issues:', sprint.issues);
     }
   };
 
@@ -62,10 +72,14 @@ function App() {
       </header>
       <main>
         <div className='conteiner'>
-          <div className='burndown'>
-            <Burndown days={selectedSprint ? selectedSprint.days : ['']} predicted={selectedSprint ? selectedSprint.predicted : []} done={selectedSprint ? selectedSprint.done : []} />
+            <Burndown 
+              days={selectedSprint ? selectedSprint.days : ['']}
+              predicted={selectedSprint ? selectedSprint.predicted : []}
+              done={selectedSprint ? selectedSprint.done : []}
+              width={dimensions.width}
+              height={dimensions.height}
+            />
           </div>
-        </div>
       </main>
     </>
   );

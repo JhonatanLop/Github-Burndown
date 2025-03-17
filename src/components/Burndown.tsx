@@ -5,9 +5,11 @@ interface ChartComponentProps {
   days: string[];
   predicted: number[];
   done: number[];
+  width: number;
+  height: number;
 }
 
-const ChartComponent: React.FC<ChartComponentProps> = ({days, predicted, done}) => {
+const ChartComponent: React.FC<ChartComponentProps> = ({days, predicted, done, width, height}) => {
   const chartRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -53,7 +55,7 @@ const ChartComponent: React.FC<ChartComponentProps> = ({days, predicted, done}) 
 
     return () => chartInstance.destroy();
   }, [days, predicted, done]);
-  return <canvas ref={chartRef} width={1776} height={777}/>;
+  return <canvas ref={chartRef} width={width} height={height} />;
 };
 
 export default ChartComponent;
