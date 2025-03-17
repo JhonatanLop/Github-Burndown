@@ -1,4 +1,4 @@
-# Git Project Status
+# Github Burndown
 
 Este projeto é um gráfico burndown automatizado que utiliza a API pública do github para buscar as informações necessárias para a reenderização do gráfico.
 O objetivo é ajudar quem deseja ter transparência no andamento de um projeto de um jeito fácil e acessível.
