@@ -58,7 +58,7 @@ function App() {
     <>
       <header>
         <h1 className='title'>
-          Dashboard Khali
+          Github Burndown
         </h1>
         <div className='config'>
           <select value={selectedSprint?.title || ''} onChange={handleSprintChange}>
